@@ -1,0 +1,56 @@
+{
+  "name": "rest-pokedex-node",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/rest-pokedex-node/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/rest-pokedex-node",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "apps/rest-pokedex-node/src/main.ts",
+        "tsConfig": "apps/rest-pokedex-node/tsconfig.app.json",
+        "assets": ["apps/rest-pokedex-node/src/assets"],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "rest-pokedex-node:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "rest-pokedex-node:build:development"
+        },
+        "production": {
+          "buildTarget": "rest-pokedex-node:build:production"
+        }
+      }
+    }
+  },
+  "tags": []
+}

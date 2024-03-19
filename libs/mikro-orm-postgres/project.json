@@ -1,0 +1,31 @@
+{
+  "name": "mikro-orm-postgres",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/mikro-orm-postgres/src",
+  "projectType": "library",
+  "tags": [],
+  "create-migration": {
+    "executor": "nx:run-commands",
+    "outputs": [],
+    "options": {
+      "cwd": "libs/mikro-orm-postgres/src/lib",
+      "command": "ts-node createMigration.ts"
+    }
+  },
+  "migrate": {
+    "executor": "nx:run-commands",
+    "outputs": [],
+    "options": {
+      "cwd": "libs/mikro-orm-postgres/src/lib",
+      "command": "ts-node migrate.ts"
+    }
+  },
+  "seed": {
+    "executor": "nx:run-commands",
+    "outputs": [],
+    "options": {
+      "cwd": "libs/mikro-orm-postgres/src/lib/seeder",
+      "command": "ts-node seed.ts"
+    }
+  }
+}
