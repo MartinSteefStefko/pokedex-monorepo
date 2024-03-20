@@ -1,6 +1,6 @@
 export type PokemonQueryParams = {
   search?: string;
   type?: string;
-  isFavorite?: boolean;
+  isFavorite?: string;
   page?: number;
 };
