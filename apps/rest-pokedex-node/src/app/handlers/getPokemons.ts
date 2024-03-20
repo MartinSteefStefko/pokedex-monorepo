@@ -2,8 +2,9 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { PokemonQueryParams } from './types';
 import { mikroOrm, Pokemon } from '@pokedex-monorepo/mikro-orm-postgres';
 import { PAGE_SIZE } from '../constants';
+import { PokemonRelations } from '../enums';
 
-export const getAllPokemons = async (
+export const getPokemons = async (
   request: FastifyRequest<{ Querystring: PokemonQueryParams }>,
   reply: FastifyReply
 ) => {
@@ -42,7 +43,7 @@ export const getAllPokemons = async (
     const page = initialPage > totalPages ? totalPages : initialPage;
 
     reply.send({
-      data: populatedPokemons,
+      results: populatedPokemons,
       totalPerPage,
       total,
       page,
@@ -65,8 +66,8 @@ export const getAllPokemons = async (
 
   const result = await qb.getResultList();
   const populatedPokemons = await em.populate(result, [
-    'attacks',
-    'evolutions',
+    PokemonRelations?.ATTACKS,
+    PokemonRelations?.EVOLUTIONS,
   ]);
   const total = await qb.getCount();
   const totalPerPage = populatedPokemons?.length;
@@ -74,7 +75,7 @@ export const getAllPokemons = async (
   const page = initialPage > totalPages ? totalPages : initialPage;
 
   reply.send({
-    data: populatedPokemons,
+    results: populatedPokemons,
     totalPerPage,
     total,
     page,

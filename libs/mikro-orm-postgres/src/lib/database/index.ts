@@ -5,7 +5,7 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { Migrator } from '@mikro-orm/migrations';
 import { SeedManager } from '@mikro-orm/seeder';
 import path = require('path');
-import { Pokemon, Evolution, Attack } from './schema';
+import { Pokemon, Evolution, Attack, FavoritePokemon } from './schema';
 import { DB_NAME, DB_URL } from '../config';
 
 export const mikroOrmConfig: Options<PostgreSqlDriver> = {
@@ -27,4 +27,4 @@ export const mikroOrm = async (config = mikroOrmConfig) => {
   return await MikroORM.init(config);
 };
 
-export { Pokemon, Evolution, Attack };
+export { Pokemon, Evolution, Attack, FavoritePokemon };

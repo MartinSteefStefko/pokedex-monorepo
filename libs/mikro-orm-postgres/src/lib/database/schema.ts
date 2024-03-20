@@ -15,7 +15,7 @@ export class Pokemon {
   @Property({ type: 'string' })
   name!: string;
 
-  @Property({ columnType: 'text[]', nullable: true, type: 'string' }) // Ensure correct type specification for arrays
+  @Property({ columnType: 'text[]', nullable: true, type: 'string' })
   types!: string[];
 
   @Property({ type: 'string', nullable: true })
@@ -36,10 +36,10 @@ export class Pokemon {
   @Property({ type: 'string', nullable: true })
   classification!: string;
 
-  @Property({ columnType: 'text[]', nullable: true, type: 'string' }) // Ensure correct type specification for arrays
+  @Property({ columnType: 'text[]', nullable: true, type: 'string' })
   resistant!: string[];
 
-  @Property({ columnType: 'text[]', nullable: true, type: 'string' }) // Ensure correct type specification for arrays
+  @Property({ columnType: 'text[]', nullable: true, type: 'string' })
   weaknesses!: string[];
 
   @Property({ type: 'number', nullable: true })
@@ -54,14 +54,14 @@ export class Pokemon {
   @Property({ type: 'string', nullable: true })
   evolutionRequirementName!: string;
 
-  @Property({ type: 'boolean', nullable: true })
-  isFavorite!: boolean;
-
   @OneToMany(() => Attack, (attack) => attack.pokemon)
   attacks = new Collection<Attack>(this);
 
   @OneToMany(() => Evolution, (evolution) => evolution.pokemon)
   evolutions = new Collection<Evolution>(this);
+
+  @OneToMany(() => FavoritePokemon, (favorite) => favorite.pokemon)
+  favorites = new Collection<FavoritePokemon>(this);
 }
 
 @Entity()
@@ -92,6 +92,18 @@ export class Evolution {
 
   @Property({ type: 'string' })
   name!: string;
+
+  @ManyToOne(() => Pokemon)
+  pokemon!: Pokemon;
+}
+
+@Entity()
+export class FavoritePokemon {
+  @PrimaryKey({ type: 'number' })
+  id!: number;
+
+  @Property({ type: 'string' })
+  userId!: string;
 
   @ManyToOne(() => Pokemon)
   pokemon!: Pokemon;

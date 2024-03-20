@@ -2,19 +2,21 @@ import { FastifyInstance } from 'fastify';
 
 import {
   getPokemonById,
-  getFavoritePokemons,
+  getPokemonTypes,
+  getPokemonByName,
   setFavoritePokemon,
   removeFavoritePokemon,
-  getAllPokemons,
+  getPokemons,
 } from '../handlers';
 import 'reflect-metadata';
 
 const PokemonRoutes = async (server: FastifyInstance) => {
-  server.get('/pokemons', getAllPokemons);
+  server.get('/pokemons', getPokemons);
   server.get('/pokemon/:id', getPokemonById);
-  server.get('/favorites', getFavoritePokemons);
-  server.post('/favorite/:id', setFavoritePokemon);
-  server.delete('/favorite/:id', removeFavoritePokemon);
+  server.get('/pokemon/types', getPokemonTypes);
+  server.get('/pokemon/name/:name', getPokemonByName);
+  server.post('/favorite', setFavoritePokemon);
+  server.delete('/favorite', removeFavoritePokemon);
 };
 
 export default PokemonRoutes;

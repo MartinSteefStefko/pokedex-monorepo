@@ -1,19 +1,45 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { pokemonsData } from './pokemonsData';
 
-const favorites: Map<string, boolean> = new Map();
+import {
+  mikroOrm,
+  FavoritePokemon,
+  Pokemon,
+} from '@pokedex-monorepo/mikro-orm-postgres';
 
 export const setFavoritePokemon = async (
-  request: FastifyRequest<{ Params: { id: string } }>,
+  request: FastifyRequest<{ Body: { id: string } }>,
   reply: FastifyReply
 ) => {
-  const { id } = request.params;
+  const { id } = request.body;
+  console.log('id', id);
 
-  if (!pokemonsData.some((pokemon) => pokemon.id === id)) {
+  const userId = 'MATT01';
+  const orm = await mikroOrm();
+  const em = orm.em.fork();
+
+  const pokemon = await em.findOne(Pokemon, { id: +id });
+
+  if (!pokemon) {
     reply.code(404).send({ message: 'Pokemon not found' });
     return;
   }
 
-  favorites.set(id, true);
+  const existingFavorite = await em.findOne(FavoritePokemon, {
+    pokemon,
+    userId,
+  });
+
+  if (existingFavorite) {
+    reply.code(400).send({ message: 'Pokemon already marked as favorite' });
+    return;
+  }
+
+  const favoritePokemon = em.create(FavoritePokemon, {
+    userId,
+    pokemon,
+  });
+
+  await em.persistAndFlush(favoritePokemon);
+
   reply.send({ message: `Pokemon with id ${id} marked as favorite` });
 };

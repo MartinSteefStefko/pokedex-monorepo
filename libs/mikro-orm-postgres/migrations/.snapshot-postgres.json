@@ -140,15 +140,6 @@
           "primary": false,
           "nullable": true,
           "mappedType": "string"
-        },
-        "is_favorite": {
-          "name": "is_favorite",
-          "type": "boolean",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "boolean"
         }
       },
       "name": "pokemon",
@@ -167,6 +158,67 @@
       ],
       "checks": [],
       "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "pokemon_id": {
+          "name": "pokemon_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        }
+      },
+      "name": "favorite_pokemon",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "favorite_pokemon_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "favorite_pokemon_pokemon_id_foreign": {
+          "constraintName": "favorite_pokemon_pokemon_id_foreign",
+          "columnNames": [
+            "pokemon_id"
+          ],
+          "localTableName": "public.favorite_pokemon",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.pokemon",
+          "updateRule": "cascade"
+        }
+      },
       "nativeEnums": {}
     },
     {
