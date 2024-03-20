@@ -14,6 +14,9 @@ comes with a LSP for Vim users.
 
 Run `npx nx serve rest_pokedex_node` to start the development server. Happy coding!
 
+Note: If new fastify app cannot find the library, remove node_modules. pnpn-lock.yaml and do:
+`pnpm i`
+
 ## Build for production
 
 Run `npx nx build rest_pokedex_node` to build the application. The build artifacts are stored in the output directory (e.g. `dist/` or `build/`), ready to be deployed.

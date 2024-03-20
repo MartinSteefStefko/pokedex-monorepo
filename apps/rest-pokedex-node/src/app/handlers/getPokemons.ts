@@ -3,9 +3,13 @@ import { PokemonQueryParams } from './types';
 import { mikroOrm, Pokemon } from '@pokedex-monorepo/mikro-orm-postgres';
 import { PAGE_SIZE } from '../constants';
 import { PokemonRelations } from '../enums';
+import { SupabaseUser } from '@pokedex-monorepo/supabase';
 
 export const getPokemons = async (
-  request: FastifyRequest<{ Querystring: PokemonQueryParams }>,
+  request: FastifyRequest<{
+    Querystring: PokemonQueryParams;
+    Params: { user: SupabaseUser };
+  }>,
   reply: FastifyReply
 ) => {
   console.log('hello');
@@ -14,6 +18,7 @@ export const getPokemons = async (
   const orm = await mikroOrm();
   console.log('orm', orm);
   const em = orm.em.fork();
+  const userId = request.params.user?.identities?.[0]?.identity_data?.sub;
 
   const { search, type, isFavorite } = request.query;
   const initialPage = +request.query.page || 1;
@@ -59,7 +64,9 @@ export const getPokemons = async (
 
   if (isFavorite !== undefined) {
     console.log('isFavorite !', isFavorite);
-    qb.andWhere({ isFavorite });
+    qb.leftJoinAndSelect('pokemon.favorites', 'fav').andWhere({
+      'fav.user_id': userId,
+    });
   }
 
   qb.limit(PAGE_SIZE).offset(offset);

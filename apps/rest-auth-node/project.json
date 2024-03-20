@@ -1,0 +1,56 @@
+{
+  "name": "rest-auth-node",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/rest-auth-node/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/rest-auth-node",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "apps/rest-auth-node/src/main.ts",
+        "tsConfig": "apps/rest-auth-node/tsconfig.app.json",
+        "assets": ["apps/rest-auth-node/src/assets"],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "rest-auth-node:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "rest-auth-node:build:development"
+        },
+        "production": {
+          "buildTarget": "rest-auth-node:build:production"
+        }
+      }
+    }
+  },
+  "tags": []
+}

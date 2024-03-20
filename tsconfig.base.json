@@ -17,7 +17,8 @@
     "paths": {
       "@pokedex-monorepo/mikro-orm-postgres": [
         "libs/mikro-orm-postgres/src/index.ts"
-      ]
+      ],
+      "@pokedex-monorepo/supabase": ["libs/supabase/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
