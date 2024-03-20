@@ -1,6 +1,10 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { PokemonQueryParams } from './types';
-import { mikroOrm, Pokemon } from '@pokedex-monorepo/mikro-orm-postgres';
+import {
+  FavoritePokemon,
+  mikroOrm,
+  Pokemon,
+} from '@pokedex-monorepo/mikro-orm-postgres';
 import { PAGE_SIZE } from '../constants';
 import { PokemonRelations } from '../enums';
 import { SupabaseUser } from '@pokedex-monorepo/supabase';
@@ -9,6 +13,7 @@ export const getPokemons = async (
   request: FastifyRequest<{
     Querystring: PokemonQueryParams;
     Params: { user: SupabaseUser };
+    Body: { user: SupabaseUser };
   }>,
   reply: FastifyReply
 ) => {
@@ -18,7 +23,7 @@ export const getPokemons = async (
   const orm = await mikroOrm();
   console.log('orm', orm);
   const em = orm.em.fork();
-  const userId = request.params.user?.identities?.[0]?.identity_data?.sub;
+  const userId = request.body.user?.identities?.[0]?.identity_data?.sub;
 
   const { search, type, isFavorite } = request.query;
   const initialPage = +request.query.page || 1;
@@ -62,10 +67,32 @@ export const getPokemons = async (
     qb.andWhere({ name: { $ilike: `%${search}%` } });
   }
 
-  if (isFavorite !== undefined) {
-    console.log('isFavorite !', isFavorite);
-    qb.leftJoinAndSelect('pokemon.favorites', 'fav').andWhere({
-      'fav.user_id': userId,
+  if (isFavorite) {
+    const favoritePokemons = await em.find(FavoritePokemon, { userId });
+    console.log('favoritePokemons', favoritePokemons);
+    const favoritePokemonIds = favoritePokemons.map((fp) => fp.pokemon.id);
+    console.log('favoritePokemonIds', favoritePokemonIds);
+    const pokemons = await em.find(Pokemon, {
+      id: { $in: favoritePokemonIds },
+    });
+    console.log('pokemons', pokemons);
+
+    const populatedPokemons = await em.populate(pokemons, [
+      'attacks',
+      'evolutions',
+    ]);
+    console.log('oppulatedPokemons', populatedPokemons);
+
+    const total = favoritePokemons.length;
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    const page = initialPage > totalPages ? totalPages : initialPage;
+
+    return reply.send({
+      results: populatedPokemons,
+      total,
+      page,
+      pageSize: PAGE_SIZE,
+      totalPages,
     });
   }
 

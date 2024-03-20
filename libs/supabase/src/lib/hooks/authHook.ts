@@ -1,10 +1,10 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 
-import { PreAuthBody } from '../../types';
+import { PreAuthBody, SupabaseUser } from '../../types';
 import { supabase } from '../client';
 
 export const authHook = async (
-  request: FastifyRequest<PreAuthBody> | any,
+  request: FastifyRequest<PreAuthBody>,
   reply: FastifyReply
 ) => {
   try {
@@ -19,7 +19,7 @@ export const authHook = async (
     if (error || !user) throw new Error('Authentication failed');
 
     if (Object.keys(request?.query).length) {
-      request.body = {};
+      request.body = {} as never;
     }
     request.body.user = user;
   } catch (error) {
