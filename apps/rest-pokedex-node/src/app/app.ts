@@ -14,15 +14,49 @@ export async function app(fastify: FastifyInstance, opts: AppOptions) {
     options: { ...opts },
   });
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  await fastify.register(require('@fastify/swagger'));
+  await fastify.register(require('@fastify/swagger'), {
+    openapi: {
+      openapi: '3.0.0',
+      info: {
+        title: 'Test swagger',
+        description: 'Testing the Fastify swagger API',
+        version: '0.1.0',
+      },
+      servers: [
+        {
+          url: 'http://localhost:3000',
+          description: 'Development server',
+        },
+      ],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: 'http',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+          },
+        },
+      },
+      security: [{ bearerAuth: [] }],
+      externalDocs: {
+        url: 'https://swagger.io',
+        description: 'Find more info here',
+      },
+    },
+  });
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   await fastify.register(require('@fastify/swagger-ui'), specs);
 
   fastify.addHook(
     'preHandler',
     async (request: FastifyRequest<PreAuthBody>, reply: FastifyReply) => {
-      const test = await authHook(request, reply);
-      console.log('test', test);
+      if (
+        !request.raw.url?.startsWith('/documentation') &&
+        !request.raw.url?.startsWith('/swagger-ui')
+      ) {
+        const test = await authHook(request, reply);
+        console.log('test', test);
+      }
     }
   );
 

@@ -6,6 +6,7 @@ export const specs = {
       description: 'API documentation',
       version: '0.1.0',
     },
+
     externalDocs: {
       url: 'https://swagger.io',
       description: 'Find more info here',

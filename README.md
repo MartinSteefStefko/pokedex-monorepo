@@ -1,8 +1,8 @@
-# PokedexMonorepo
+# Pokedex Monorepo
+
+> The backend for pokedex api with identity solution.
 
 ![Charmeleon Logo](./assets/charmeleon_logo.png)
-
-The backend for pokedex api with identity solution.
 
 ## How to run
 
@@ -47,7 +47,7 @@ Make migrations: `pnpm nx run mikro-orm-postgres:make-migrations`
 Migrate: `pnpm nx run mikro-orm-postgres:migrate`
 Seed: `pnpm nx run mikro-orm-postgres:seed`
 
-# Documentation
+## Documentation
 
 [rest-pokedex-node documentation](http://localhost:3000/documentation)
 [rest-auth-node documentation](http://localhost:3001/documentation)

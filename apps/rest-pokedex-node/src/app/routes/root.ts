@@ -8,15 +8,59 @@ import {
   removeFavoritePokemon,
   getPokemons,
 } from '../handlers';
+import {
+  getPokemonByIdSchema,
+  getPokemonByNameSchema,
+  getPokemonTypesSchema,
+  getPokemonsSchema,
+  removeFavoritePokemonSchema,
+  setFavoritePokemonSchema,
+} from '../schemas';
 import 'reflect-metadata';
 
 const PokemonRoutes = async (server: FastifyInstance) => {
-  server.get('/pokemons', getPokemons);
-  server.get('/pokemon/:id', getPokemonById);
-  server.get('/pokemon/types', getPokemonTypes);
-  server.get('/pokemon/name/:name', getPokemonByName);
-  server.post('/favorite', setFavoritePokemon);
-  server.delete('/favorite', removeFavoritePokemon);
+  server.get(
+    '/pokemons',
+    {
+      schema: getPokemonsSchema,
+    },
+    getPokemons
+  );
+  server.get(
+    '/pokemon/:id',
+    {
+      schema: getPokemonByIdSchema,
+    },
+    getPokemonById
+  );
+  server.get(
+    '/pokemon/types',
+    {
+      schema: getPokemonTypesSchema,
+    },
+    getPokemonTypes
+  );
+  server.get(
+    '/pokemon/name/:name',
+    {
+      schema: getPokemonByNameSchema,
+    },
+    getPokemonByName
+  );
+  server.post(
+    '/favorite',
+    {
+      schema: setFavoritePokemonSchema,
+    },
+    setFavoritePokemon
+  );
+  server.delete(
+    '/favorite',
+    {
+      schema: removeFavoritePokemonSchema,
+    },
+    removeFavoritePokemon
+  );
 };
 
 export default PokemonRoutes;

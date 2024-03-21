@@ -36,3 +36,12 @@ export type SupabaseUser = {
   updated_at: string;
   is_anonymous: boolean;
 };
+
+export type Session = {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  expires_at: number;
+  refresh_token: string;
+  user: User;
+};
