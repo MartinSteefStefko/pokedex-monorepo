@@ -13,9 +13,6 @@ export const signInUser = async (
     password,
   });
   const { user, session } = data;
-  console.log('user', user);
-  console.log('session,', session);
-  console.log('error', error);
 
   if (error) {
     reply.code(400).send({ error: error.message });

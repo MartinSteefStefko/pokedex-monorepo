@@ -54,8 +54,7 @@ export async function app(fastify: FastifyInstance, opts: AppOptions) {
         !request.raw.url?.startsWith('/documentation') &&
         !request.raw.url?.startsWith('/swagger-ui')
       ) {
-        const test = await authHook(request, reply);
-        console.log('test', test);
+        await authHook(request, reply);
       }
     }
   );
