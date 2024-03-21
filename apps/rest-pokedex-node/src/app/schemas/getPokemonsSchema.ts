@@ -119,6 +119,7 @@ export const getPokemonsSchema = {
         },
         total: { type: 'integer' },
         page: { type: 'integer' },
+        totalPerPage: { type: 'integer' },
         pageSize: { type: 'integer' },
         totalPages: { type: 'integer' },
       },

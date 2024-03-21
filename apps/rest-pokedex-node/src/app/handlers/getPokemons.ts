@@ -93,6 +93,7 @@ export const getPokemons = async (
     total,
     page: currentPage,
     pageSize: PAGE_SIZE,
+    totalPerPage: Array.isArray(mappedPokemons) && mappedPokemons.length,
     totalPages,
   });
   await orm.close();
