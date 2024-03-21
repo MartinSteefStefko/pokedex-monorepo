@@ -1,6 +1,6 @@
 # PokedexMonorepo
 
-![Charmeleon Logo](../assets/charmeleon_logo.png)
+![Charmeleon Logo](./assets/charmeleon_logo.png)
 
 The backend for pokedex api with identity solution.
 
