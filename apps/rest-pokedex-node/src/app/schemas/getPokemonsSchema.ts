@@ -9,19 +9,17 @@ export const getPokemonsSchema = {
     properties: {
       search: {
         type: 'string',
-        description: 'Search term to filter pokemons by name',
-        default: 'Pika',
+        description: 'Search term to filter pokemons by name e.g. Pika',
       },
       type: {
         type: 'string',
-        description: 'Filter pokemons by type, comma-separated values',
-        default: 'Fire',
+        description:
+          'Filter pokemons by type, comma-separated values e.g. Electric',
       },
       isFavorite: {
         type: 'string',
         description:
           'Filter by favorite pokemons, expected value: "true" or "false"',
-        default: false,
       },
       page: {
         type: 'integer',

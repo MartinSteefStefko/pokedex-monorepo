@@ -31,10 +31,12 @@ export const removeFavoritePokemon = async (
     await em.removeAndFlush(favorite);
 
     reply.send({ message: `Pokemon with id ${id} removed from favorites` });
+    await orm.close();
   } catch (error) {
     console.error(error);
     reply.code(500).send({
       message: 'An error occurred while removing the favorite Pokemon',
     });
+    await orm.close();
   }
 };

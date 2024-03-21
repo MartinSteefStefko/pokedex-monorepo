@@ -22,4 +22,5 @@ export const getPokemonTypes = async (
   reply.send({
     types: uniqueTypes,
   });
+  await orm.close();
 };

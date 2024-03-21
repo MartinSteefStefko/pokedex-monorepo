@@ -18,10 +18,12 @@ export const authHook = async (
 
     if (error || !user) throw new Error('Authentication failed');
 
-    if (Object.keys(request?.query).length) {
+    if (request.method === 'GET') {
       request.body = {} as never;
+      request.body.user = user;
+    } else {
+      request.body.user = user;
     }
-    request.body.user = user;
   } catch (error) {
     reply.code(401).send({ error: 'Authentication failed' });
   }

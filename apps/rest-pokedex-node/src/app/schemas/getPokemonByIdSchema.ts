@@ -7,8 +7,7 @@ export const getPokemonByIdSchema = {
     properties: {
       id: {
         type: 'string',
-        description: 'Unique identifier of the pokemon',
-        default: 1,
+        description: 'Unique identifier of the pokemon e.g. 1',
       },
     },
 

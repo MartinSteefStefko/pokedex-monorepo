@@ -7,7 +7,7 @@ export const getPokemonByNameSchema = {
     properties: {
       name: {
         type: 'string',
-        description: 'Name of the pokemon to search for',
+        description: 'Name of the pokemon to search for e.g. Bulba',
       },
     },
     required: ['name'],
