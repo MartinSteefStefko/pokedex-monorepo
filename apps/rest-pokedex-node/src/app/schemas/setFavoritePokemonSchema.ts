@@ -6,7 +6,7 @@ export const setFavoritePokemonSchema = {
     type: 'object',
     properties: {
       id: {
-        type: 'string',
+        type: 'number',
         description: 'ID of the pokemon to mark as favorite e.g. 1',
       },
     },

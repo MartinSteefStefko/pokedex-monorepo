@@ -1,7 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 
 import {
-  mikroOrm,
+  MikroORM,
+  mikroOrmConfig,
   FavoritePokemon,
   Pokemon,
 } from '@pokedex-monorepo/mikro-orm-postgres';
@@ -13,13 +14,14 @@ export const setFavoritePokemon = async (
 ) => {
   const { id } = request.body;
   const userId = request.body.user?.identities?.[0]?.identity_data?.sub;
-  const orm = await mikroOrm();
+  const orm = await MikroORM.init(mikroOrmConfig);
   const em = orm.em.fork();
 
   const pokemon = await em.findOne(Pokemon, { id: +id });
 
   if (!pokemon) {
     reply.code(404).send({ message: 'Pokemon not found' });
+    await orm.close();
     return;
   }
 
@@ -30,6 +32,7 @@ export const setFavoritePokemon = async (
 
   if (existingFavorite) {
     reply.code(400).send({ message: 'Pokemon already marked as favorite' });
+    await orm.close();
     return;
   }
 

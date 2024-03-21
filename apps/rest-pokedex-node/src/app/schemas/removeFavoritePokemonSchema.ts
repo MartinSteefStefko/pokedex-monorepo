@@ -6,7 +6,7 @@ export const removeFavoritePokemonSchema = {
     type: 'object',
     properties: {
       id: {
-        type: 'string',
+        type: 'number',
         description: 'ID of the pokemon to remove from favorites e.g. 1',
       },
     },

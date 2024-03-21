@@ -1,13 +1,15 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import {
-  mikroOrm,
+  MikroORM,
   Pokemon,
   FavoritePokemon,
+  mikroOrmConfig,
 } from '@pokedex-monorepo/mikro-orm-postgres';
 import { PAGE_SIZE } from '../constants';
 import { PokemonQueryParams } from './types';
 import { SupabaseUser } from '@pokedex-monorepo/supabase';
 import { mapPokemon } from '../helpers';
+import 'reflect-metadata';
 
 export const getPokemons = async (
   request: FastifyRequest<{
@@ -17,7 +19,7 @@ export const getPokemons = async (
   }>,
   reply: FastifyReply
 ) => {
-  const orm = await mikroOrm();
+  const orm = await MikroORM.init(mikroOrmConfig);
 
   const em = orm.em.fork();
   const userId = request.body.user?.identities?.[0]?.identity_data?.sub;

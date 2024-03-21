@@ -8,7 +8,7 @@ import path = require('path');
 import { Pokemon, Evolution, Attack, FavoritePokemon } from './schema';
 import { DB_NAME, DB_URL } from '../config';
 
-export const mikroOrmConfig: Options<PostgreSqlDriver> = {
+const mikroOrmConfig: Options<PostgreSqlDriver> = {
   entities: [Pokemon],
   extensions: [Migrator, SeedManager],
   dbName: DB_NAME,
@@ -21,14 +21,16 @@ export const mikroOrmConfig: Options<PostgreSqlDriver> = {
   },
   driver: PostgreSqlDriver,
   metadataProvider: ReflectMetadataProvider,
-  pool: { min: 2, max: 100 },
+  pool: { min: 2, max: 20 },
 };
 
-export const mikroOrm = async (config = mikroOrmConfig) => {
-  console.log('DB_NAME', DB_NAME);
-  console.log('DB_URL', DB_URL);
-
-  return await MikroORM.init(config);
+export {
+  Pokemon,
+  Evolution,
+  Attack,
+  FavoritePokemon,
+  DB_NAME,
+  DB_URL,
+  MikroORM,
+  mikroOrmConfig,
 };
-
-export { Pokemon, Evolution, Attack, FavoritePokemon };
