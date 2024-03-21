@@ -21,5 +21,11 @@
       "@pokedex-monorepo/supabase": ["libs/supabase/src/index.ts"]
     }
   },
+  "include": [
+    "apps/rest-pokedex-node/**/*.ts",
+    "apps/rest-auth-node/**/*.ts",
+    "libs/supabase/**/*.ts",
+    "libs/mikro-orm-postgres/**/*.ts"
+  ],
   "exclude": ["node_modules", "tmp"]
 }

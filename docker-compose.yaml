@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  pokedex-node:
+    build:
+      context: .
+    command: 'node dist/apps/rest-pokedex-node/main.js'
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/usr/src/app
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env
+
+  auth-node:
+    build:
+      context: .
+    command: 'node dist/apps/rest-auth-node/main.js'
+    ports:
+      - '3001:3001'
+    volumes:
+      - .:/usr/src/app
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env
