@@ -21,9 +21,13 @@ export const mikroOrmConfig: Options<PostgreSqlDriver> = {
   },
   driver: PostgreSqlDriver,
   metadataProvider: ReflectMetadataProvider,
+  pool: { min: 2, max: 100 },
 };
 
 export const mikroOrm = async (config = mikroOrmConfig) => {
+  console.log('DB_NAME', DB_NAME);
+  console.log('DB_URL', DB_URL);
+
   return await MikroORM.init(config);
 };
 

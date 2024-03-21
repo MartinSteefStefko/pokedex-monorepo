@@ -18,6 +18,7 @@ export const getPokemons = async (
   reply: FastifyReply
 ) => {
   const orm = await mikroOrm();
+
   const em = orm.em.fork();
   const userId = request.body.user?.identities?.[0]?.identity_data?.sub;
   const { search, type, isFavorite, page = 1 } = request.query;
