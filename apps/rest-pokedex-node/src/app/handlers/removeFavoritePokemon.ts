@@ -23,16 +23,13 @@ export const removeFavoritePokemon = async (
       await orm.close();
       return;
     }
-    console.log('pokemon', pokemon);
 
     const favorite = await em.findOne(FavoritePokemon, { pokemon, userId });
-    console.log('favorite', favorite);
     if (!favorite) {
       reply.code(404).send({ message: 'Pokemon not found in favorites' });
       await orm.close();
       return;
     }
-
     await em.removeAndFlush(favorite);
 
     reply.send({ message: `Pokemon with id ${id} removed from favorites` });

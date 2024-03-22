@@ -2,8 +2,9 @@ import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { Pokemon, Evolution, Attack } from '../database/schema';
 import { pokemons } from './pokemons';
-import { mikroOrm } from '../database';
+
 import { AttackTypeEnum } from '../enums';
+import { MikroORM, mikroOrmConfig } from '../database';
 
 class PokemonSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
@@ -110,7 +111,7 @@ class PokemonSeeder extends Seeder {
 }
 
 export const seedDatabase = async () => {
-  const orm = await mikroOrm();
+  const orm = await MikroORM.init(mikroOrmConfig);
   const em = orm.em.fork();
   const seeder = new PokemonSeeder();
 
