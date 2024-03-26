@@ -13,7 +13,7 @@ There 2 applications:
 rest-pokedex-node
 rest-auth-node
 
-Run `npx nx serve  <app_name> --watch` to start the development servers. Both are needed to complete the flow.
+Run `pnpm nx serve <app_name> --watch` to start the development servers. Both are needed to complete the flow.
 
 Note: If new fastify app cannot find the library, remove node_modules. pnpn-lock.yaml and do:
 `pnpm i`
