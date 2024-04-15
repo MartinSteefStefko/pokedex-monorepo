@@ -1,13 +1,17 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20240318175453 extends Migration {
+export class Migration20240415120947 extends Migration {
 
   async up(): Promise<void> {
-    this.addSql('create table "pokemon" ("id" serial primary key, "name" varchar(255) not null, "types" text[] null, "weight_minimum" varchar(255) null, "weight_maximum" varchar(255) null, "height_minimum" varchar(255) null, "height_maximum" varchar(255) null, "flee_rate" varchar(255) null, "classification" varchar(255) null, "resistant" text[] null, "weaknesses" text[] null, "max_cp" int null, "max_hp" int null, "evolution_requirement_amount" int null, "evolution_requirement_name" varchar(255) null);');
+    this.addSql('create table "pokemon" ("id" uuid not null, "name" varchar(255) not null, "types" text[] null, "weight_minimum" varchar(255) null, "weight_maximum" varchar(255) null, "height_minimum" varchar(255) null, "height_maximum" varchar(255) null, "flee_rate" varchar(255) null, "classification" varchar(255) null, "resistant" text[] null, "weaknesses" text[] null, "max_cp" int null, "max_hp" int null, "evolution_requirement_amount" int null, "evolution_requirement_name" varchar(255) null, constraint "pokemon_pkey" primary key ("id"));');
 
-    this.addSql('create table "evolution" ("id" serial primary key, "name" varchar(255) not null, "pokemon_id" int not null);');
+    this.addSql('create table "favorite_pokemon" ("id" uuid not null, "user_id" varchar(255) not null, "pokemon_id" uuid not null, constraint "favorite_pokemon_pkey" primary key ("id"));');
 
-    this.addSql('create table "attack" ("id" serial primary key, "attack_type" varchar(255) null, "name" varchar(255) not null, "type" varchar(255) null, "damage" int null, "pokemon_id" int not null);');
+    this.addSql('create table "evolution" ("id" uuid not null, "name" varchar(255) not null, "pokemon_id" uuid not null, constraint "evolution_pkey" primary key ("id"));');
+
+    this.addSql('create table "attack" ("id" uuid not null, "attack_type" varchar(255) null, "name" varchar(255) not null, "type" varchar(255) null, "damage" int null, "pokemon_id" uuid not null, constraint "attack_pkey" primary key ("id"));');
+
+    this.addSql('alter table "favorite_pokemon" add constraint "favorite_pokemon_pokemon_id_foreign" foreign key ("pokemon_id") references "pokemon" ("id") on update cascade;');
 
     this.addSql('alter table "evolution" add constraint "evolution_pokemon_id_foreign" foreign key ("pokemon_id") references "pokemon" ("id") on update cascade;');
 
@@ -17,6 +21,8 @@ export class Migration20240318175453 extends Migration {
   async down(): Promise<void> {
     this.addSql('create schema if not exists "auth";');
 
+    this.addSql('create schema if not exists "realtime";');
+
     this.addSql('create schema if not exists "storage";');
 
     this.addSql('create schema if not exists "vault";');
@@ -25,11 +31,17 @@ export class Migration20240318175453 extends Migration {
     this.addSql('comment on table "auth"."audit_log_entries" is \'Auth: Audit trail for user actions.\';');
     this.addSql('create index "audit_logs_instance_id_idx" on "auth"."audit_log_entries" ("instance_id");');
 
+    this.addSql('create table "realtime"."broadcasts" ("id" bigserial primary key, "channel_id" int8 not null, "check" bool not null default false, "inserted_at" timestamp(0) not null, "updated_at" timestamp(0) not null);');
+    this.addSql('alter table "realtime"."broadcasts" add constraint "broadcasts_channel_id_index" unique ("channel_id");');
+
     this.addSql('create table "storage"."buckets" ("id" text not null, "name" text not null, "owner" uuid null, "created_at" timestamptz(6) null default now(), "updated_at" timestamptz(6) null default now(), "public" bool null default false, "avif_autodetection" bool null default false, "file_size_limit" int8 null, "allowed_mime_types" text[] null, "owner_id" text null, constraint "buckets_pkey" primary key ("id"));');
     this.addSql('comment on column "storage"."buckets"."owner" is \'Field is deprecated, use owner_id instead\';');
     this.addSql('alter table "storage"."buckets" add constraint "bname" unique ("name");');
 
-    this.addSql('create table "auth"."flow_state" ("id" uuid not null, "user_id" uuid null, "auth_code" text not null, "code_challenge_method" code_challenge_method not null, "code_challenge" text not null, "provider_type" text not null, "provider_access_token" text null, "provider_refresh_token" text null, "created_at" timestamptz(6) null, "updated_at" timestamptz(6) null, "authentication_method" text not null, constraint "flow_state_pkey" primary key ("id"));');
+    this.addSql('create table "realtime"."channels" ("id" bigserial primary key, "name" varchar(255) not null, "inserted_at" timestamp(0) not null, "updated_at" timestamp(0) not null, "check" bool null default false);');
+    this.addSql('alter table "realtime"."channels" add constraint "channels_name_index" unique ("name");');
+
+    this.addSql('create table "auth"."flow_state" ("id" uuid not null, "user_id" uuid null, "auth_code" text not null, "code_challenge_method" code_challenge_method not null, "code_challenge" text not null, "provider_type" text not null, "provider_access_token" text null, "provider_refresh_token" text null, "created_at" timestamptz(6) null, "updated_at" timestamptz(6) null, "authentication_method" text not null, "auth_code_issued_at" timestamptz(6) null, constraint "flow_state_pkey" primary key ("id"));');
     this.addSql('comment on table "auth"."flow_state" is \'stores metadata for pkce logins\';');
     this.addSql('create index "flow_state_created_at_idx" on "auth"."flow_state" ("created_at");');
     this.addSql('create index "idx_auth_code" on "auth"."flow_state" ("auth_code");');
@@ -67,6 +79,9 @@ export class Migration20240318175453 extends Migration {
     this.addSql('alter table "storage"."objects" add constraint "bucketid_objname" unique ("bucket_id", "name");');
     this.addSql('create index "name_prefix_search" on "storage"."objects" ("name");');
 
+    this.addSql('create table "realtime"."presences" ("id" bigserial primary key, "channel_id" int8 not null, "check" bool not null default false, "inserted_at" timestamp(0) not null, "updated_at" timestamp(0) not null);');
+    this.addSql('alter table "realtime"."presences" add constraint "presences_channel_id_index" unique ("channel_id");');
+
     this.addSql('create table "auth"."refresh_tokens" ("instance_id" uuid null, "id" bigserial primary key, "token" varchar(255) null, "user_id" varchar(255) null, "revoked" bool null, "created_at" timestamptz(6) null, "updated_at" timestamptz(6) null, "parent" varchar(255) null, "session_id" uuid null);');
     this.addSql('comment on table "auth"."refresh_tokens" is \'Auth: Store of tokens used to refresh JWT tokens once they expire.\';');
     this.addSql('create index "refresh_tokens_instance_id_idx" on "auth"."refresh_tokens" ("instance_id");');
@@ -76,7 +91,7 @@ export class Migration20240318175453 extends Migration {
     this.addSql('alter table "auth"."refresh_tokens" add constraint "refresh_tokens_token_unique" unique ("token");');
     this.addSql('create index "refresh_tokens_updated_at_idx" on "auth"."refresh_tokens" ("updated_at");');
 
-    this.addSql('create table "auth"."saml_providers" ("id" uuid not null, "sso_provider_id" uuid not null, "entity_id" text not null, "metadata_xml" text not null, "metadata_url" text null, "attribute_mapping" jsonb null, "created_at" timestamptz(6) null, "updated_at" timestamptz(6) null, constraint "saml_providers_pkey" primary key ("id"), constraint entity_id not empty check (char_length(entity_id) > 0), constraint metadata_url not empty check ((metadata_url = NULL::text) OR (char_length(metadata_url) > 0)), constraint metadata_xml not empty check (char_length(metadata_xml) > 0));');
+    this.addSql('create table "auth"."saml_providers" ("id" uuid not null, "sso_provider_id" uuid not null, "entity_id" text not null, "metadata_xml" text not null, "metadata_url" text null, "attribute_mapping" jsonb null, "created_at" timestamptz(6) null, "updated_at" timestamptz(6) null, "name_id_format" text null, constraint "saml_providers_pkey" primary key ("id"), constraint entity_id not empty check (char_length(entity_id) > 0), constraint metadata_url not empty check ((metadata_url = NULL::text) OR (char_length(metadata_url) > 0)), constraint metadata_xml not empty check (char_length(metadata_xml) > 0));');
     this.addSql('comment on table "auth"."saml_providers" is \'Auth: Manages SAML Identity Provider connections.\';');
     this.addSql('alter table "auth"."saml_providers" add constraint "saml_providers_entity_id_key" unique ("entity_id");');
     this.addSql('create index "saml_providers_sso_provider_id_idx" on "auth"."saml_providers" ("sso_provider_id");');
@@ -89,6 +104,8 @@ export class Migration20240318175453 extends Migration {
 
     this.addSql('create table "auth"."schema_migrations" ("version" varchar(255) not null, constraint "schema_migrations_pkey" primary key ("version"));');
     this.addSql('comment on table "auth"."schema_migrations" is \'Auth: Manages updates to the auth system.\';');
+
+    this.addSql('create table "realtime"."schema_migrations" ("version" int8 not null, "inserted_at" timestamp(0) null, constraint "schema_migrations_pkey" primary key ("version"));');
 
     this.addSql('create table "vault"."secrets" ("id" uuid not null default gen_random_uuid(), "name" text null, "description" text not null default \'\', "secret" text not null, "key_id" uuid null default (pgsodium.create_key()).id, "nonce" bytea null default pgsodium.crypto_aead_det_noncegen(), "created_at" timestamptz(6) not null default CURRENT_TIMESTAMP, "updated_at" timestamptz(6) not null default CURRENT_TIMESTAMP, constraint "secrets_pkey" primary key ("id"));');
     this.addSql('comment on table "vault"."secrets" is \'Table with encrypted `secret` column for storing sensitive information on disk.\';');
@@ -111,6 +128,10 @@ export class Migration20240318175453 extends Migration {
     this.addSql('comment on column "auth"."sso_providers"."resource_id" is \'Auth: Uniquely identifies a SSO provider according to a user-chosen resource ID (case insensitive), useful in infrastructure as code.\';');
     this.addSql('alter table "auth"."sso_providers" add constraint "sso_providers_resource_id_idx" unique ("lower(resource_id)");');
 
+    this.addSql('create table "realtime"."subscription" ("id" int8 generated always as identity not null, "subscription_id" uuid not null, "entity" regclass not null, "filters" user_defined_filter[] not null default \'{}\', "claims" jsonb not null, "claims_role" regrole generated always as realtime.to_regrole((claims ->> \'role\'::text)) stored not null, "created_at" timestamp(6) not null default timezone(\'utc\'::text, now()), constraint "pk_subscription" primary key ("id"));');
+    this.addSql('create index "ix_realtime_subscription_entity" on "realtime"."subscription" ("entity");');
+    this.addSql('alter table "realtime"."subscription" add constraint "subscription_subscription_id_entity_filters_key" unique ("subscription_id", "entity", "filters");');
+
     this.addSql('create table "auth"."users" ("instance_id" uuid null, "id" uuid not null, "aud" varchar(255) null, "role" varchar(255) null, "email" varchar(255) null, "encrypted_password" varchar(255) null, "email_confirmed_at" timestamptz(6) null, "invited_at" timestamptz(6) null, "confirmation_token" varchar(255) null, "confirmation_sent_at" timestamptz(6) null, "recovery_token" varchar(255) null, "recovery_sent_at" timestamptz(6) null, "email_change_token_new" varchar(255) null, "email_change" varchar(255) null, "email_change_sent_at" timestamptz(6) null, "last_sign_in_at" timestamptz(6) null, "raw_app_meta_data" jsonb null, "raw_user_meta_data" jsonb null, "is_super_admin" bool null, "created_at" timestamptz(6) null, "updated_at" timestamptz(6) null, "phone" text null, "phone_confirmed_at" timestamptz(6) null, "phone_change" text null default \'\', "phone_change_token" varchar(255) null default \'\', "phone_change_sent_at" timestamptz(6) null, "confirmed_at" timestamptz(6) generated always as LEAST(email_confirmed_at, phone_confirmed_at) stored null, "email_change_token_current" varchar(255) null default \'\', "email_change_confirm_status" int2 null default 0, "banned_until" timestamptz(6) null, "reauthentication_token" varchar(255) null default \'\', "reauthentication_sent_at" timestamptz(6) null, "is_sso_user" bool not null default false, "deleted_at" timestamptz(6) null, "is_anonymous" bool not null default false, constraint "users_pkey" primary key ("id"), constraint users_email_change_confirm_status_check check ((email_change_confirm_status >= 0) AND (email_change_confirm_status <= 2)));');
     this.addSql('comment on table "auth"."users" is \'Auth: Stores user login data within a secure schema.\';');
     this.addSql('comment on column "auth"."users"."is_sso_user" is \'Auth: Set this column to true when the account comes from SSO. These accounts can have duplicate emails.\';');
@@ -125,6 +146,8 @@ export class Migration20240318175453 extends Migration {
     this.addSql('create index "users_is_anonymous_idx" on "auth"."users" ("is_anonymous");');
     this.addSql('alter table "auth"."users" add constraint "users_phone_key" unique ("phone");');
 
+    this.addSql('alter table "realtime"."broadcasts" add constraint "broadcasts_channel_id_fkey" foreign key ("channel_id") references "realtime"."channels" ("id") on update no action on delete cascade;');
+
     this.addSql('alter table "auth"."identities" add constraint "identities_user_id_fkey" foreign key ("user_id") references "auth"."users" ("id") on update no action on delete cascade;');
 
     this.addSql('alter table "auth"."mfa_amr_claims" add constraint "mfa_amr_claims_session_id_fkey" foreign key ("session_id") references "auth"."sessions" ("id") on update no action on delete cascade;');
@@ -134,6 +157,8 @@ export class Migration20240318175453 extends Migration {
     this.addSql('alter table "auth"."mfa_factors" add constraint "mfa_factors_user_id_fkey" foreign key ("user_id") references "auth"."users" ("id") on update no action on delete cascade;');
 
     this.addSql('alter table "storage"."objects" add constraint "objects_bucketId_fkey" foreign key ("bucket_id") references "storage"."buckets" ("id") on update no action on delete no action;');
+
+    this.addSql('alter table "realtime"."presences" add constraint "presences_channel_id_fkey" foreign key ("channel_id") references "realtime"."channels" ("id") on update no action on delete cascade;');
 
     this.addSql('alter table "auth"."refresh_tokens" add constraint "refresh_tokens_session_id_fkey" foreign key ("session_id") references "auth"."sessions" ("id") on update no action on delete cascade;');
 

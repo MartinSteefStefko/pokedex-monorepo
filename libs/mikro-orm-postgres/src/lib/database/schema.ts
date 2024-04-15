@@ -1,21 +1,23 @@
 import {
   Entity,
   PrimaryKey,
+  ArrayType,
   Property,
   ManyToOne,
   OneToMany,
   Collection,
 } from '@mikro-orm/core';
+import { v4 } from 'uuid';
 
 @Entity()
 export class Pokemon {
-  @PrimaryKey({ type: 'number' })
-  id!: number;
+  @PrimaryKey({ type: 'uuid' })
+  id: string = v4();
 
   @Property({ type: 'string' })
   name!: string;
 
-  @Property({ columnType: 'text[]', nullable: true, type: 'string' })
+  @Property({ type: ArrayType, nullable: true })
   types!: string[];
 
   @Property({ type: 'string', nullable: true })
@@ -36,10 +38,10 @@ export class Pokemon {
   @Property({ type: 'string', nullable: true })
   classification!: string;
 
-  @Property({ columnType: 'text[]', nullable: true, type: 'string' })
+  @Property({ type: ArrayType, nullable: true })
   resistant!: string[];
 
-  @Property({ columnType: 'text[]', nullable: true, type: 'string' })
+  @Property({ type: ArrayType, nullable: true })
   weaknesses!: string[];
 
   @Property({ type: 'number', nullable: true })
@@ -66,8 +68,8 @@ export class Pokemon {
 
 @Entity()
 export class Attack {
-  @PrimaryKey({ type: 'number' })
-  id!: number;
+  @PrimaryKey({ type: 'uuid' })
+  id: string = v4();
 
   @Property({ type: 'string', nullable: true })
   attackType!: 'fast' | 'special';
@@ -87,8 +89,8 @@ export class Attack {
 
 @Entity()
 export class Evolution {
-  @PrimaryKey({ type: 'number' })
-  id!: number;
+  @PrimaryKey({ type: 'uuid' })
+  id: string = v4();
 
   @Property({ type: 'string' })
   name!: string;
@@ -99,8 +101,8 @@ export class Evolution {
 
 @Entity()
 export class FavoritePokemon {
-  @PrimaryKey({ type: 'number' })
-  id!: number;
+  @PrimaryKey({ type: 'uuid' })
+  id: string = v4();
 
   @Property({ type: 'string' })
   userId!: string;

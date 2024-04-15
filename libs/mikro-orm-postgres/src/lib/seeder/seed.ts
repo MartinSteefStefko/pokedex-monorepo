@@ -5,12 +5,13 @@ import { pokemons } from './pokemons';
 
 import { AttackTypeEnum } from '../enums';
 import { MikroORM, mikroOrmConfig } from '../database';
+import { v4 } from 'uuid';
 
 class PokemonSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
     await Promise.all(
       pokemons.map(async (pokemonData) => {
-        const pokemonId = parseInt(pokemonData.id, 10);
+        const pokemonId = v4();
         const pokemonEntity =
           (await em.findOne(Pokemon, pokemonId)) ??
           em.create(Pokemon, {
@@ -54,12 +55,30 @@ class PokemonSeeder extends Seeder {
             )
           ),
         ];
-        const evolutionPromises =
-          pokemonData.evolutions?.map((evolution) =>
-            this.createEvolutionEntity(em, evolution, pokemonEntity)
-          ) || [];
 
-        await Promise.all([...attackPromises, ...evolutionPromises]);
+        await Promise.all(attackPromises);
+      })
+    );
+
+    await em.flush();
+
+    await Promise.all(
+      pokemons.map(async (pokemonData) => {
+        const pokemonEntity = await em.findOneOrFail(Pokemon, {
+          name: pokemonData.name,
+        });
+
+        if (pokemonData.evolutions) {
+          await Promise.all(
+            pokemonData.evolutions.map(async (evolutionData) => {
+              await this.createEvolutionEntity(
+                em,
+                evolutionData,
+                pokemonEntity
+              );
+            })
+          );
+        }
       })
     );
 
@@ -72,14 +91,12 @@ class PokemonSeeder extends Seeder {
     attackType: 'fast' | 'special',
     pokemon: Pokemon
   ) {
-    const existingAttack = await em.findOne(Attack, {
-      name: attackData.name,
-      type: attackData.type,
-      pokemon,
-    });
+    const attackId = v4();
+    const existingAttack = await em.findOne(Attack, { id: attackId });
     const attackEntity =
       existingAttack ??
       em.create(Attack, {
+        id: attackId,
         ...attackData,
         attackType,
         pokemon,
@@ -91,22 +108,16 @@ class PokemonSeeder extends Seeder {
 
   private async createEvolutionEntity(
     em: EntityManager,
-    evolutionData: { id: number; name: string },
+    evolutionData: { name: string },
     pokemon: Pokemon
   ) {
-    const existingEvolution = await em.findOne(Evolution, {
-      id: evolutionData.id,
+    const evolutionId = v4();
+    const evolutionEntity = em.create(Evolution, {
+      ...evolutionData,
+      id: evolutionId,
+      pokemon,
     });
-
-    const evolutionEntity =
-      existingEvolution ?? em.create(Evolution, evolutionData);
-
-    if (!existingEvolution) {
-      evolutionEntity.pokemon = pokemon;
-      em.persist(evolutionEntity);
-    } else {
-      evolutionEntity.name = evolutionData.name;
-    }
+    em.persist(evolutionEntity);
   }
 }
 

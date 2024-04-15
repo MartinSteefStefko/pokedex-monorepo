@@ -60,7 +60,7 @@ Start the rest-auth-node and go to the [rest-auth-node documentation](http://loc
 
 # Database
 
-Make migrations: `pnpm nx run mikro-orm-postgres:make-migrations`
+Make migrations: `pnpm nx run mikro-orm-postgres:create-migration`
 Migrate: `pnpm nx run mikro-orm-postgres:migrate`
 Seed: `pnpm nx run mikro-orm-postgres:seed`
 
