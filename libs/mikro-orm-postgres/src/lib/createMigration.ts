@@ -1,7 +1,7 @@
-import { MikroORM, mikroOrmConfig } from './database';
+import { initORM } from './database';
 
 const createMigration = async () => {
-  const orm = await MikroORM.init(mikroOrmConfig);
+  const orm = await initORM();
   const migrator = orm.getMigrator();
   const migration = await migrator.createMigration();
 

@@ -1,25 +1,21 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { EntityManager } from '@mikro-orm/core';
-import {
-  Pokemon,
-  MikroORM,
-  mikroOrmConfig,
-} from '@pokedex-monorepo/mikro-orm-postgres';
+import { RequestContext } from '@mikro-orm/core';
+import { Pokemon } from '@pokedex-monorepo/mikro-orm-postgres';
 import { PokemonRelations } from '../enums';
 import { mapPokemon } from '../helpers';
 
 export const getPokemonById = async (
   request: FastifyRequest<{ Params: { id: string } }>,
-  reply: FastifyReply
+  reply: FastifyReply,
+  RequestContext: RequestContext
 ) => {
-  const orm = await MikroORM.init(mikroOrmConfig);
-  const em: EntityManager = orm.em.fork();
+  const em = RequestContext.em;
   const { id } = request.params;
 
-  const pokemon = await em.findOne(Pokemon, { id: parseInt(id, 10) });
+  const pokemon = await em.findOne(Pokemon, { id: id });
   if (!pokemon) {
     reply.code(404).send({ message: 'Pokemon not found' });
-    await orm.close();
+
     return;
   }
   const populatedPokemon = await em.populate(pokemon, [
@@ -29,5 +25,4 @@ export const getPokemonById = async (
   const mappedPokemon = mapPokemon(populatedPokemon);
 
   reply.send(mappedPokemon);
-  await orm.close();
 };

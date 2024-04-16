@@ -1,14 +1,17 @@
 import * as path from 'path';
+import { RequestContext } from '@mikro-orm/core';
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import AutoLoad from '@fastify/autoload';
 
 import { specs } from '../config/swagger';
 import { authHook, PreAuthBody } from '@pokedex-monorepo/supabase';
+import { initORM } from '@pokedex-monorepo/mikro-orm-postgres';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface AppOptions {}
 
 export async function app(fastify: FastifyInstance, opts: AppOptions) {
+  const db = await initORM();
   fastify.register(AutoLoad, {
     dir: path.join(__dirname, 'plugins'),
     options: { ...opts },
@@ -58,6 +61,14 @@ export async function app(fastify: FastifyInstance, opts: AppOptions) {
       }
     }
   );
+
+  fastify.addHook('onRequest', (request, reply, done) => {
+    RequestContext.create(db.em, done);
+  });
+
+  fastify.addHook('onClose', async () => {
+    await db.orm.close();
+  });
 
   fastify.register(AutoLoad, {
     dir: path.join(__dirname, 'routes'),

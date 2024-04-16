@@ -4,7 +4,7 @@ import { Pokemon, Evolution, Attack } from '../database/schema';
 import { pokemons } from './pokemons';
 
 import { AttackTypeEnum } from '../enums';
-import { MikroORM, mikroOrmConfig } from '../database';
+import { initORM } from '../database';
 import { v4 } from 'uuid';
 
 class PokemonSeeder extends Seeder {
@@ -122,7 +122,7 @@ class PokemonSeeder extends Seeder {
 }
 
 export const seedDatabase = async () => {
-  const orm = await MikroORM.init(mikroOrmConfig);
+  const orm = await initORM();
   const em = orm.em.fork();
   const seeder = new PokemonSeeder();
 

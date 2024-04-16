@@ -1,11 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import {
-  MikroORM,
-  Pokemon,
-  FavoritePokemon,
-  mikroOrmConfig,
-} from '@pokedex-monorepo/mikro-orm-postgres';
+import { Pokemon, FavoritePokemon } from '@pokedex-monorepo/mikro-orm-postgres';
+
 import { PAGE_SIZE } from '../constants';
+import { RequestContext } from '@mikro-orm/core';
 import { PokemonQueryParams } from './types';
 import { SupabaseUser } from '@pokedex-monorepo/supabase';
 import { mapPokemon } from '../helpers';
@@ -17,11 +14,10 @@ export const getPokemons = async (
     Params: { user: SupabaseUser };
     Body: { user: SupabaseUser };
   }>,
-  reply: FastifyReply
+  reply: FastifyReply,
+  RequestContext: RequestContext
 ) => {
-  const orm = await MikroORM.init(mikroOrmConfig);
-
-  const em = orm.em.fork();
+  const em = RequestContext.em as any;
   const userId = request.body.user?.identities?.[0]?.identity_data?.sub;
   const { search, type, isFavorite, page = 1 } = request.query;
   const offset = (page - 1) * PAGE_SIZE;
@@ -86,5 +82,4 @@ export const getPokemons = async (
     totalPerPage: Array.isArray(mappedPokemons) && mappedPokemons.length,
     totalPages,
   });
-  await orm.close();
 };

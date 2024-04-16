@@ -1,18 +1,15 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import {
-  MikroORM,
-  Pokemon,
-  mikroOrmConfig,
-} from '@pokedex-monorepo/mikro-orm-postgres';
+import { Pokemon } from '@pokedex-monorepo/mikro-orm-postgres';
+import { RequestContext } from '@mikro-orm/core';
 import { PokemonRelations } from '../enums';
 import { mapPokemon } from '../helpers';
 
 export const getPokemonByName = async (
   request: FastifyRequest<{ Params: { name: string } }>,
-  reply: FastifyReply
+  reply: FastifyReply,
+  RequestContext: RequestContext
 ) => {
-  const orm = await MikroORM.init(mikroOrmConfig);
-  const em = orm.em.fork();
+  const em = RequestContext.em;
 
   const { name } = request.params;
 
@@ -26,5 +23,4 @@ export const getPokemonByName = async (
   const mappedPokemons = mapPokemon(populatedPokemons);
 
   reply.send(mappedPokemons);
-  await orm.close();
 };
